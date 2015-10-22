@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title>Shopping Cart - {% block pageTitle %}{% endblock %}</title>
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/global.css') }}" />
+</head>
+<body>
+	<div class="container-fluid">
+		{% block content %}{% endblock %}
+	</div>
+	{% block jsImports %}{% endblock %}
+	<script type="text/javascript" src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.12.0/react.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.12.0/JSXTransformer.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block pageTitle %} Bili na! {% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-sm-6">
+			<div id="inventory"></div>
+		</div>
+
+		<div class="col-sm-6">
+			<div id="cart"></div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block jsImports %}
+	<script type="text/jsx" src="{{ url_for('static', filename='js/custom/cart.js') }}"></script>
+	<script type="text/jsx" src="{{ url_for('static', filename='js/custom/inv.js') }}"></script>
+	<script type="text/jsx">
+		React.render(<CartBox />, document.getElementById('cart'));
+
+		React.render(<InventoryBox url='/getproducts' />, document.getElementById('inventory'));
+
+	</script>
+{% endblock %}
