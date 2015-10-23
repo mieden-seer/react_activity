@@ -21,6 +21,7 @@ items = [
 ]
 
 cart_items = []
+total_price = 0
 
 @invroute.route('/getproducts', methods=['GET','POST'])
 def get_sample_data():
@@ -31,20 +32,32 @@ def get_sample_data():
         })
     return jsonify(items=items)
 
-@invroute.route('/addcart', methods=['POST'])
+@invroute.route('/addcart', methods=['GET', 'POST'])
 def add_to_cart():
-	item = {
-		'name': request.form['name'],
-		'price': request.form['price'],
-		'quantity': int(request.form['quantity'])
-	}
+	if request.method=='POST':
+		item = {
+			'name': request.form['name'],
+			'price': request.form['price'],
+			'quantity': int(request.form['quantity']),
+			'subtotal': 0,
+			'total': 0 
+		}
 
-	for c in cart_items:
-		if(c['name'] == item['name']):
-			c['quantity'] += int(item['quantity'])
-			break
-	else:
-		cart_items.append(item)
+		global total_price
+
+		for c in cart_items:
+			print total_price
+			if(c['name'] == item['name']):
+				c['quantity'] += int(item['quantity'])
+				c['subtotal'] += int(item['quantity']) * int(item['price'])
+				total_price += int(item['quantity']) * int(item['price'])
+				c['total'] = total_price		
+				break
+		else:
+			item['subtotal'] = int(item['price']) * int(item['quantity'])
+			total_price += item['subtotal']
+			item['total'] = total_price
+			cart_items.append(item)
 
 	return jsonify(cart_items=cart_items)
 

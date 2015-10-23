@@ -12,6 +12,19 @@ var InventoryBox = React.createClass({
 				alert(this.props.url + status + error.toString());
 			}.bind(this)
 		});
+
+		$.ajax({
+			url: this.props.add_url,
+			dataType: 'json',
+			cache: false,
+			success: function(data){
+				var itemDict = JSON.parse(JSON.stringify(data));
+				this.setState({cart_data: itemDict['cart_items']});
+			}.bind(this),
+			error: function(xhr, status, error){
+				alert(this.props.url + status + error.toString());
+			}.bind(this)
+		});
 	},
 	handleAddItemSubmit: function(new_item){
 		$.ajax({
@@ -29,30 +42,47 @@ var InventoryBox = React.createClass({
 		});
 	},
 	getInitialState: function(){
-		return {data: []};
+		return {data: [], cart_data: []};
 	},
 	componentDidMount: function(){
 		this.loadItemsFromServer();
 	},
+	addItemsOnCart: function(cart_item){
+		$.ajax({
+			url: this.props.add_url,
+			dataType: 'json',
+			type: 'POST',
+			data: cart_item,
+			success: function(data){
+				var cartDict = JSON.parse(JSON.stringify(data));
+				this.setState({cart_data: cartDict['cart_items']});//Change this line for add to cart
+			}.bind(this),
+			error: function(xhr, status, err){
+				alert(this.props.add_url + status + err.toString());
+			}.bind(this)
+		});
+	},
 	render: function(){
 		return (
 			<div>
-				<ItemList data={this.state.data} />
+				<ItemList data={this.state.data} addItemTCart={this.addItemsOnCart} />
 				<ItemForm onAddItemSubmit={this.handleAddItemSubmit} />
+				<CartBox cart_data={this.state.cart_data} />
 			</div>
 		);
 	}
 });
 
 var ItemList = React.createClass({
+	addC: function(cart_item){
+		this.props.addItemTCart(cart_item);
+	},
 	render: function(){
 		var items = this.props.data.map(function (item, index){
 			return (
-				<Item key={index} item_name={item.name} item_price={item.price} />
+				<Item key={index} item_name={item.name} item_price={item.price} addItemToCart={this.addC} />
 			);
-		});
-
-		var className = "table"
+		}.bind(this));
 
 		return (
 			<div>
@@ -74,21 +104,6 @@ var ItemList = React.createClass({
 });
 
 var Item = React.createClass({
-	addItemToCart: function(cart_item){
-		$.ajax({
-			url: '/addcart',
-			dataType: 'json',
-			type: 'POST',
-			data: cart_item,
-			success: function(data){
-				var cartDict = JSON.parse(JSON.stringify(data));
-				this.setState({data: cartDict['cart_items']});//Change this line for add to cart
-			}.bind(this),
-			error: function(xhr, status, err){
-				alert(this.props.url + status + err.toString());
-			}.bind(this)
-		});
-	},
 	addToCart: function(e){
 		e.preventDefault();
 		var form = e.target;
@@ -100,7 +115,7 @@ var Item = React.createClass({
 			return;
 		}
 
-		this.addItemToCart({name: pname, price: price, quantity: quantity});
+		this.props.addItemToCart({name: pname, price: price, quantity: quantity});
 
 		form.pname.value = '';
 		form.price.value = '';
@@ -110,13 +125,22 @@ var Item = React.createClass({
 	},
 	render: function(){
 		return (
-			<form onSubmit={this.addToCart}>
-				<input type="hidden" name="pname" value={this.props.item_name} />
-				<input type="hidden" name="price" value={this.props.item_price} />
-				<label>{this.props.item_name}</label>
-				<label>{this.props.item_price}</label>
-				<input type="text" name="quantity" />
-				<button type="submit">Add to cart</button>
+			<form onSubmit={this.addToCart} role="form" className="form-horizontal">
+				<div className="form-group">
+					<label className="control-label col-sm-2">{this.props.item_name}</label>
+					<div className="col-sm-10">
+						<input type="hidden" name="pname" value={this.props.item_name} />
+					</div>
+
+					<label className="control-label col-sm-2">{this.props.item_price}</label>
+					<div className="col-sm-10">
+						<input type="hidden" name="price" value={this.props.item_price} />
+					</div>
+
+
+					<input type="text" name="quantity" />
+					<button className="btn btn-warning" type="submit">Add to cart</button>
+				</div>
 			</form>
 			// <tr>
 			// 	<td>{this.props.item_name}</td>

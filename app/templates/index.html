@@ -18,9 +18,7 @@
 	<script type="text/jsx" src="{{ url_for('static', filename='js/custom/cart.js') }}"></script>
 	<script type="text/jsx" src="{{ url_for('static', filename='js/custom/inv.js') }}"></script>
 	<script type="text/jsx">
-		React.render(<CartBox />, document.getElementById('cart'));
-
-		React.render(<InventoryBox url='/getproducts' />, document.getElementById('inventory'));
+		React.render(<InventoryBox url='/getproducts' add_url='/addcart' />, document.getElementById('inventory'));
 
 	</script>
 {% endblock %}
